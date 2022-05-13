@@ -1,24 +1,44 @@
-import logo from './logo.svg';
 import './App.css';
-
+import MovieList from './Component/MovieList';
+import Search from './Component/Search';
+import FilmsData from './Data/Data';
+import {useState} from 'react';
+import AddMovie from './Component/AddMovie';
+import {Routes,Route} from "react-router-dom";
+import ErrorPage from './Component/ErrorPage';
+import Description from './Component/Description';
 function App() {
+  //Data to grab
+  const [movieData, setMovieData] = useState(FilmsData);
+  
+  //Handle the Search process
+  const [search, setSearch] = useState('');
+  const handleSearch = (el) => setSearch(el.target.value);
+
+  //Handle the Rating process
+  const [searchRating, setSearchRating] = useState(1);
+  const handleRating = (rating) => setSearchRating(rating);
+
+  //ADD Movie
+  const handleAdd=(newMovieData)=>setMovieData([...movieData, newMovieData])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path='/' element={ <div className="App">
+    <Search search={search} handleSearch={handleSearch} handleRating={handleRating} searchRating={searchRating}/>
+    <MovieList
+    movies={movieData.filter((el)=>el.name
+      .toLowerCase()
+      .includes(search.toLocaleLowerCase().trim())
+      && el.rating>=searchRating)}
+    />
+    <AddMovie handleAdd={handleAdd}/>
+    </div>}/>
+    <Route path='/:id' element={<Description movieData={movieData}/>}/>
+    <Route path='*' element={<ErrorPage/>}/>    
+    </Routes>
+
+
   );
 }
 
